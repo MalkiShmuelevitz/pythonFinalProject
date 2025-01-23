@@ -1,10 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'layout.html' %}
+{% block information %}
+  <h4>Apartments</h4>
+<ul>
+    {% for apartment in apartments %}
+    <div>
+    <h4>{{apartment}}</h4>
+         {% for image in images %}
+            {% if image.apartment == apartment %}
+                <img src="{{image.image.url}}" width="100px">
+            {% endif %}
+         {%endfor%}
+        <button class="btn btn-info">Add Request</button>
+    </div>
+    {%endfor%}
+</ul>
+{% endblock %}

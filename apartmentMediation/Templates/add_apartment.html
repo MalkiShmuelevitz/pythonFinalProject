@@ -1,10 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'layout.html' %}
+{% block information %}
+  <h4>Add Apartment</h4>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{apartment_form.as_p}}
+    {{address_form.as_p}}
+    {{images_form.as_p}}
+    <button type="submit">Save</button>
+</form>
+{% endblock %}
