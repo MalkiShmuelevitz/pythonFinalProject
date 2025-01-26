@@ -34,7 +34,7 @@ class Apartment(models.Model):
        SOLD = "SOLD", _("Sold")
        FOR_SALE = "FOR_SALE", _("For_sale")
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
-    seller = models.ForeignKey(User, on_delete=models.DO_NOTHING,)
+    seller= models.ForeignKey(User, on_delete=models.DO_NOTHING,)
     address = models.OneToOneField(Address, on_delete=models.CASCADE)
     numberRooms = models.IntegerField()
     size = models.FloatField()
@@ -51,13 +51,13 @@ class Apartment(models.Model):
 class Interested(models.Model):
     buyer = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     apartment = models.ForeignKey(Apartment, on_delete=models.DO_NOTHING)
+    def createInterested(self,buyer,apartment):
+        self.buyer = buyer
+        self.apartment = apartment
+        return self
 
 
 class Image(models.Model):
     apartment = models.ForeignKey(Apartment, on_delete=models.DO_NOTHING)
     image = models.ImageField(upload_to='images/', null=True, blank=True)
 
-
-class Request(models.Model):
-    apartment = models.ForeignKey(Apartment, on_delete=models.DO_NOTHING)
-    buyer = models.ForeignKey(User, on_delete=models.DO_NOTHING)

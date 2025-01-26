@@ -1,11 +1,46 @@
 {% extends 'layout.html' %}
+{% load form_tags %}
 {% block information %}
-  <h4>Add Apartment</h4>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{apartment_form.as_p}}
-    {{address_form.as_p}}
-    {{images_form.as_p}}
-    <button type="submit">Save</button>
-</form>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4 col-sm-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white text-center">
+                    <h4>Add Apartment</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- Apartment Name -->
+                        {% for field in apartment_form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label fw-bold h6">{{ field.label }}</label>
+                                {{ field|add_class:"form-control form-control-sm w-100" }}
+                            </div>
+                        {% endfor %}
+
+                        <!-- Address -->
+                        {% for field in address_form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label fw-bold h6">{{ field.label }}</label>
+                                {{ field|add_class:"form-control form-control-sm w-100" }}
+                            </div>
+                        {% endfor %}
+
+                        <!-- Images -->
+                        {% for field in images_form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label fw-bold h6">{{ field.label }}</label>
+                                {{ field|add_class:"form-control form-control-sm w-100" }}
+                            </div>
+                        {% endfor %}
+
+                        <button type="submit" class="btn btn-success w-100 btn-sm">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

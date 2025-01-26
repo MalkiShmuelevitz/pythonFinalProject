@@ -1,17 +1,91 @@
 {% extends 'layout.html' %}
+
 {% block information %}
   <h4>Apartments</h4>
-<ul>
-    {% for apartment in apartments %}
-    <div>
-    <h4>{{apartment}}</h4>
-         {% for image in images %}
-            {% if image.apartment == apartment %}
-                <img src="{{image.image.url}}" width="100px">
-            {% endif %}
-         {%endfor%}
-        <button class="btn btn-info">Add Request</button>
+
+  <!-- הוספת Bootstrap (CSS ו-JS) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- הוספת CSS לעיצוב אחיד של התמונות -->
+  <style>
+    .carousel-inner {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      height: 200px; /* גובה אחיד לכל התמונות */
+    }
+
+    .carousel-item {
+      height: 100%;
+    }
+
+    .carousel-item img {
+      width: 100%;
+      height: 100%; /* התמונה תתמלא בגובה שציינת */
+      object-fit: cover; /* מבטיח שהתמונה לא תתעקם */
+    }
+  </style>
+
+  <!-- טופס סינון -->
+  <form method="post" class="mb-4">
+    {% csrf_token %}
+    <div class="input-group">
+      <select name="filterSelect" class="form-select">
+        <option value="city">City</option>
+        <option value="numberOfrooms">Number of Rooms</option>
+      </select>
+      <input class="form-control" placeholder="Add a filter" name="filterInput">
+      <button type="submit" class="btn btn-primary">Send</button>
+      <button type="reset" class="btn btn-secondary" onclick="window.location.href = window.location.pathname;">Clear</button>
     </div>
-    {%endfor%}
-</ul>
+  </form>
+
+  <!-- הצגת הדירות -->
+   <div class="row">
+    {% for apartment in apartments %}
+      <div class="col-md-4 mb-4">
+        <div class="card">
+          <div id="carousel{{ apartment.id }}" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              {% for image in images %}
+                {% if image.apartment == apartment %}
+                  <!-- לא נוסיף את active בצורה כזו -->
+                  <div>
+<!--                  <div class="carousel-item {% if forloop.first %} active{% endif %}">-->
+                    <img src="{{ image.image.url }}" class="d-block w-100" alt="Apartment Image">
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ apartment.id }}" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ apartment.id }}" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
+
+          <div class="card-body">
+            <h5 class="card-title">{{ apartment.name }}</h5>
+            <p class="card-text">{{ apartment.description }}</p> <!-- תיאור הדירה -->
+            <p class="card-text"><strong>Price: </strong>{{ apartment.price }} USD</p> <!-- מחיר הדירה -->
+            <p class="card-text"><strong>Location: </strong>{{ apartment.address.city }}, {{ apartment.address.street }}</p> <!-- מיקום הדירה -->
+            <p class="card-text"><strong>Number of rooms: </strong>{{ apartment.numberRooms }}</p> <!-- מספר חדרים -->
+
+            {% if seller != 'null' and apartment.status != 'SOLD' %}
+              <a href="{% url 'sale' id=apartment.id %}" class="btn btn-success">Sale</a>
+              <a href="{% url 'requests' id=apartment.id %}" class="btn btn-info">Requests</a>
+            {% elif seller == 'null' %}
+              <a href="{% url 'add_request' id=apartment.id %}" class="btn btn-primary">Add Request</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
 {% endblock %}

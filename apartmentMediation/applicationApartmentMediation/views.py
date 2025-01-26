@@ -7,8 +7,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.db import transaction
 from django.contrib.auth import get_user_model
-from .forms import RegisterForm, ApartmentForm, AddressForm, ImagesForm,ApartmentMediatorForm
-from .models import User, Apartment, Address, Image
+from .forms import RegisterForm, ApartmentForm, AddressForm, ImagesForm, ApartmentMediatorForm
+from .models import User, Apartment, Address, Image, Interested
 
 # Create your views here.
 
@@ -90,14 +90,89 @@ def AddApartment(request):
 
 @login_required(login_url='login')
 def Apartments(request):
-    apartments = Apartment.objects.all()
-    if request.user.status == 'BUYER':
-        all_apartments = filter(lambda x: x.status == 'FOR_SALE', apartments)
+    # אם המשתמש שלח את הטופס
+    if request.method == 'POST':
+        selected_item = request.POST.get('filterSelect')
+        filterField = request.POST.get('filterInput')
+        apartments = Apartment.objects.all()
+        # סינון דירות לפי קריטריונים
+        if selected_item == 'numberOfrooms' and filterField:
+            apartments = apartments.filter(numberRooms=filterField)
+        if selected_item == 'city' and filterField:
+            apartments = apartments.filter(address__city=filterField)
     else:
-        all_apartments = filter(lambda x: x.seller == request.user, apartments)
-    data = {
-        'apartments': all_apartments,
-        'images': Image.objects.all()
-    }
+        apartments = Apartment.objects.all()  # אם לא נבחרו פילטרים, הצגת כל הדירות
+
+    # בדיקה אם המשתמש הוא קונה או מוכר
+    if request.user.status == 'BUYER':
+        all_apartments = apartments.filter(status='FOR_SALE')
+        data = {
+            'apartments': all_apartments,
+            'images': Image.objects.filter(apartment__in=apartments),
+            'seller': "null"
+        }
+    else:
+        all_apartments = apartments.filter(seller=request.user)
+        data = {
+            'apartments': all_apartments,
+            'images': Image.objects.filter(apartment__in=apartments),
+            'seller': request.user
+        }
+
     return render(request, 'view_apartment.html', data)
 
+
+@login_required(login_url='login')
+def add_request(request,id):
+    interested = Interested()
+    interested.createInterested(request.user, Apartment.objects.get(id=id))
+    interested.save()
+    next_url = request.GET.get('next', 'apartments')
+    return redirect(next_url)
+
+
+@login_required(login_url='login')
+def sale(request, id):
+    apartment = Apartment.objects.get(id=id)
+    apartment.status = "SOLD"
+    apartment.save()
+    next_url = request.GET.get('next', 'apartments')
+    return redirect(next_url)
+
+
+@login_required(login_url='login')
+def requests(request, id):
+    requests = Interested.objects.all()
+    all_requests = filter(lambda x: x.apartment.id == id, requests)
+    data = {
+        'requests': all_requests
+    }
+    return render(request, 'requests.html', data)
+
+@login_required(login_url='login')
+def personal(request):
+    apartments_all = Apartment.objects.all()
+    apartments = filter(lambda x: x.seller == request.user and x.status == 'SOLD',apartments_all)
+    total_price = 0
+    for i in apartments:
+        total_price = total_price + i.charge / 100 * i.price
+    return render(request, 'personal.html', {'total_price': total_price})
+
+
+@login_required(login_url='login')
+def filterByData(request):
+	if request.method == 'POST':
+		selectedItem = request.POST.get('filterSelect')
+		filterField = request.POST.get('filterInput')
+		if selectedItem == 'customer':
+			p = Buy.objects.filter(customerId__tz__name=filterField)
+		if selectedItem == 'product':
+			p = Buy.objects.filter(productId__name=filterField)
+		if selectedItem == 'date':
+			p = Buy.objects.filter(date=filterField)
+	else:
+		p = Buy.objects.all()
+	data={
+			"result": p
+		}
+	return render(request, 'filters.html', data)
