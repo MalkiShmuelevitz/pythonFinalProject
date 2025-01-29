@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block information %}
-  <h4>Apartments</h4>
+
 
   <!-- הוספת Bootstrap (CSS ו-JS) -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -10,6 +10,7 @@
 
   <!-- הוספת CSS לעיצוב אחיד של התמונות -->
   <style>
+
     .carousel-inner {
       position: relative;
       width: 100%;
@@ -17,19 +18,64 @@
       height: 200px; /* גובה אחיד לכל התמונות */
     }
 
-    .carousel-item {
-      height: 100%;
-    }
 
-    .carousel-item img {
-      width: 100%;
-      height: 100%; /* התמונה תתמלא בגובה שציינת */
-      object-fit: cover; /* מבטיח שהתמונה לא תתעקם */
-    }
+/* הגדרת גודל קבוע לכרטיס */
+.card {
+   width:300px;
+  height: 425px;  /* גובה קבוע לכרטיס */
+  display: flex;
+  flex-direction: column;
+}
+
+.card-body {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* עיצוב ה-image-wrapper כך שהרוחב יתפרס לפי מספר התמונות */
+.image-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px; /* רווח בין התמונות */
+  max-height: 200px;  /* הגדרת גובה מקסימלי לתמונות */
+  overflow: hidden;
+}
+
+.image-container {
+  flex: 1;  /* כל תמונה תיקח את הרוחב של ה-container שלה */
+  margin-bottom: 10px;  /* רווח בתחתית התמונות */
+  max-width: 100%;  /* תמונה תתפוס את כל הרוחב */
+}
+
+.image-container img {
+  width: 100%;  /* כל תמונה תיקח את כל רוחב ה-container שלה */
+  height: 100%;  /* תמונה תתפוס את כל הגובה שלה */
+  object-fit: cover;  /* מילוי התא עם שמירה על פרופורציות */
+}
+      .row{
+      --bs-gutter-x: -59.5rem;
+    --bs-gutter-y: 0;
+    display: flex;
+    margin-top: calc(-1* var(--bs-gutter-y));
+    margin-right: calc(-.5* var(--bs-gutter-x));
+    margin-left: calc(-.5* var(--bs-gutter-x));
+}
+ .btn-logout {
+            background-color: #78917b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 20px; /* הוספתי רווח משמאל */
+        }
+      }
   </style>
 
   <!-- טופס סינון -->
-  <form method="post" class="mb-4">
+  <form method="post" class="mb-4 mt-4">
     {% csrf_token %}
     <div class="input-group">
       <select name="filterSelect" class="form-select">
@@ -45,30 +91,18 @@
   <!-- הצגת הדירות -->
    <div class="row">
     {% for apartment in apartments %}
-      <div class="col-md-4 mb-4">
-        <div class="card">
-          <div id="carousel{{ apartment.id }}" class="carousel slide" data-bs-ride="carousel">
-            <div class="carousel-inner">
-              {% for image in images %}
-                {% if image.apartment == apartment %}
-                  <!-- לא נוסיף את active בצורה כזו -->
-                  <div>
-<!--                  <div class="carousel-item {% if forloop.first %} active{% endif %}">-->
-                    <img src="{{ image.image.url }}" class="d-block w-100" alt="Apartment Image">
-                  </div>
-                {% endif %}
-              {% endfor %}
-            </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#carousel{{ apartment.id }}" data-bs-slide="prev">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carousel{{ apartment.id }}" data-bs-slide="next">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Next</span>
-            </button>
-          </div>
 
+<div class="col-md-4 mb-4">
+    <div class="card">
+      <div class="image-wrapper mb-3 d-flex">
+        {% for image in images %}
+          {% if image.apartment == apartment %}
+            <div class="image-container">
+              <img src="{{ image.image.url }}" alt="Apartment Image" class="w-100">
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
           <div class="card-body">
             <h5 class="card-title">{{ apartment.name }}</h5>
             <p class="card-text">{{ apartment.description }}</p> <!-- תיאור הדירה -->
@@ -77,11 +111,52 @@
             <p class="card-text"><strong>Number of rooms: </strong>{{ apartment.numberRooms }}</p> <!-- מספר חדרים -->
 
             {% if seller != 'null' and apartment.status != 'SOLD' %}
-              <a href="{% url 'sale' id=apartment.id %}" class="btn btn-success">Sale</a>
-              <a href="{% url 'requests' id=apartment.id %}" class="btn btn-info">Requests</a>
+                <a href="{% url 'sale' id=apartment.id %}" class="btn btn-success">Sale</a>
+                <a href="{% url 'requests' id=apartment.id %}" class="btn btn-info">Requests</a>
             {% elif seller == 'null' %}
-              <a href="{% url 'add_request' id=apartment.id %}" class="btn btn-primary">Add Request</a>
-            {% endif %}
+                <a href="javascript:void(0);" class="btn-logout"  onclick="sendRequest({{ apartment.id }})">Add Request</a>
+           {% elif apartment.status == 'SOLD' %}
+              <a  class="btn btn-danger" >   Sold    </a>
+           {% endif %}
+
+<!-- דיאלוג -->
+<div id="success-dialog" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; width: 300px; background: linear-gradient(135deg, #6EE7B7, #3B82F6); color: white; padding: 20px; border-radius: 15px; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); text-align: center; font-family: Arial, sans-serif;">
+    <p style="font-size: 18px; margin: 0;">פניתך התקבלה בהצלחה</p>
+    <button onclick="closeDialog()" style="margin-top: 15px; padding: 10px 20px; background: white; color: #3B82F6; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; transition: all 0.3s ease;">סגור</button>
+</div>
+
+<!-- רקע שקוף -->
+<div id="dialog-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9998;"></div>
+
+<script>
+function sendRequest(apartmentId) {
+    fetch(`/add_request/${apartmentId}`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            // הצגת הדיאלוג
+            document.getElementById('success-dialog').style.display = 'block';
+            document.getElementById('dialog-overlay').style.display = 'block';
+        } else if (data.error) {
+            alert(data.error);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function closeDialog() {
+    document.getElementById('success-dialog').style.display = 'none';
+    document.getElementById('dialog-overlay').style.display = 'none';
+}
+</script>
+
+
           </div>
         </div>
       </div>

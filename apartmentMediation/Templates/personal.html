@@ -1,5 +1,40 @@
 {% extends 'layout.html' %}
+
 {% block information %}
-    <h4>Personal Account</h4>
-    <div>{{total_price}}</div>
+    <div class="container" style="margin-top: 150px;">
+        <!-- כותרת מרכזית -->
+        <div style="background: linear-gradient(135deg, #78917b, #6b46c1); padding: 30px; border-radius: 15px; color: white; text-align: center; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
+            <h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 10px;">אזור אישי</h1>
+            <p style="font-size: 1.2rem;">ברוך הבא, {{ user.username }}!</p>
+        </div>
+
+        <!-- כרטיס מידע פיננסי -->
+        <div style="margin-top: 30px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
+            <h2 style="font-size: 1.8rem; font-weight: bold; color: #78917b; margin-bottom: 20px;">סיכום פיננסי</h2>
+            <p style="font-size: 1.2rem;">סה"כ הכנסות מדירות שמכרת:</p>
+            <div style="font-size: 2.5rem; font-weight: bold; color: #10b981; margin-bottom: 20px;">${{ total_price }}</div>
+            <button onclick="window.location.href='/apartments';" style="padding: 10px 20px; background: #78917b; color: white; border: none; border-radius: 10px; font-size: 1rem; cursor: pointer; transition: all 0.3s;">
+                עיין בדירות שלך
+            </button>
+        </div>
+
+        <!-- כרטיס מידע נוסף -->
+        <div style="margin-top: 20px; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 280px; background: #f9fafb; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); text-align: center;">
+                <h3 style="font-size: 1.5rem; color: #4b5563;">דירות פעילות</h3>
+                <p style="font-size: 1.2rem; color: #6b7280;">לחץ לצפייה בדירות הפעילות שלך.</p>
+                <button onclick="window.location.href='/apartments';" style="padding: 10px 20px; background: #78917b; color: white; border: none; border-radius: 10px; font-size: 1rem; cursor: pointer; transition: all 0.3s;">
+                    צפייה בדירות
+                </button>
+            </div>
+
+<!--            <div style="flex: 1; min-width: 280px; background: #f9fafb; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); text-align: center;">-->
+<!--                <h3 style="font-size: 1.5rem; color: #4b5563;">עדכונים אחרונים</h3>-->
+<!--                <p style="font-size: 1.2rem; color: #6b7280;">התעדכן בפרטים ובבקשות החדשות שלך.</p>-->
+<!--                <button onclick="window.location.href='/updates';" style="padding: 10px 20px; background: #78917b; color: white; border: none; border-radius: 10px; font-size: 1rem; cursor: pointer; transition: all 0.3s;">-->
+<!--                    ראה עדכונים-->
+<!--                </button>-->
+<!--            </div>-->
+        </div>
+    </div>
 {% endblock %}

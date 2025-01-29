@@ -9,7 +9,7 @@ from django.db import transaction
 from django.contrib.auth import get_user_model
 from .forms import RegisterForm, ApartmentForm, AddressForm, ImagesForm, ApartmentMediatorForm
 from .models import User, Apartment, Address, Image, Interested
-
+from django.http import JsonResponse
 # Create your views here.
 
 
@@ -60,7 +60,7 @@ def AddApartment(request):
                     with transaction.atomic():
                         address = ad.save()
                         apartment = apa.save(commit=False)
-                        images = ima.save(commit=False)
+                        images = request.FILES.getlist('image')
                         apartment.seller = request.user
                         if request.user.status != 'MEDIATOR':
                             apartment.isMediator = False
@@ -68,10 +68,11 @@ def AddApartment(request):
                         else:
                             apartment.isMediator = True
                         apartment.address = address
-                        images.apartment = apartment
                         apartment.save()
-                        images.save()
-                        return HttpResponse("Apartment SAVED")
+                        for img in images:
+                            Image.objects.create(apartment=apartment, image=img)
+                        # לאחר שמירת הדירה, מפנים לעמוד של ההצלחה
+                        return render(request, 'apartment_saved.html')  # עמוד חדש שמציג את ההודעה המוצלחת
             else:
                 return HttpResponse("UnAthoriezed")
         if request.user.status == 'MEDIATOR':
@@ -86,6 +87,7 @@ def AddApartment(request):
             'images_form': images_form})
     else:
         return redirect('login/')
+
 
 
 @login_required(login_url='login')
@@ -123,12 +125,14 @@ def Apartments(request):
 
 
 @login_required(login_url='login')
-def add_request(request,id):
-    interested = Interested()
-    interested.createInterested(request.user, Apartment.objects.get(id=id))
-    interested.save()
-    next_url = request.GET.get('next', 'apartments')
-    return redirect(next_url)
+def add_request(request, id):
+    if request.method == 'POST':  # בדוק שהבקשה היא מסוג POST
+        interested = Interested()
+        interested.createInterested(request.user, Apartment.objects.get(id=id))
+        interested.save()
+        return JsonResponse({"message": "פניתך התקבלה בהצלחה"})
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
 
 
 @login_required(login_url='login')
@@ -142,8 +146,8 @@ def sale(request, id):
 
 @login_required(login_url='login')
 def requests(request, id):
-    requests = Interested.objects.all()
-    all_requests = filter(lambda x: x.apartment.id == id, requests)
+    requests_all = Interested.objects.all()
+    all_requests = list(filter(lambda x: x.apartment.id == id, requests_all))
     data = {
         'requests': all_requests
     }
@@ -159,20 +163,3 @@ def personal(request):
     return render(request, 'personal.html', {'total_price': total_price})
 
 
-@login_required(login_url='login')
-def filterByData(request):
-	if request.method == 'POST':
-		selectedItem = request.POST.get('filterSelect')
-		filterField = request.POST.get('filterInput')
-		if selectedItem == 'customer':
-			p = Buy.objects.filter(customerId__tz__name=filterField)
-		if selectedItem == 'product':
-			p = Buy.objects.filter(productId__name=filterField)
-		if selectedItem == 'date':
-			p = Buy.objects.filter(date=filterField)
-	else:
-		p = Buy.objects.all()
-	data={
-			"result": p
-		}
-	return render(request, 'filters.html', data)

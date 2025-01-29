@@ -4,6 +4,7 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from .views import add_request
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path("", views.get_home_page,name='home'),
@@ -15,7 +16,8 @@ urlpatterns = [
     path("sale/<int:id>", views.sale, name='sale'),
     path("requests/<int:id>", views.requests, name='requests'),
     path("personal/", views.personal, name='personal'),
-    path("filters/", views.filterByData),
+    # path("filters/", views.filterByData),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout')
 
 ]
 if settings.DEBUG:

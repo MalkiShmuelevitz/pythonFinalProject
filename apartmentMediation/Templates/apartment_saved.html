@@ -1,10 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'layout.html' %}
+
+{% block information %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-sm-8">
+            <div class="card shadow-lg" style="background-color:white;">
+                <div class="card-header text-white text-center" style="background-color: #78917b;">
+                    <h4>Apartment Saved</h4>
+                </div>
+                <div class="card-body text-center">
+                    <h3 style="color: black;">הדירה נוספה בהצלחה!</h3>
+                    <p style="font-size: 1.2rem; color: #6c757d;">הדירה החדשה שלך נוספה למערכת בהצלחה.</p>
+                    <a href="{% url 'apartments' %}" class="btn  btn-lg mt-3" style="background-color: #78917b;">חזור לדירות שלי</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

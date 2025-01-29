@@ -132,3 +132,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # AUTH_USER_MODEL = "users_management.UserManage"
 
 AUTH_USER_MODEL = 'applicationApartmentMediation.User'
+
+LOGOUT_REDIRECT_URL = '/'

@@ -5,13 +5,12 @@
     <div class="row justify-content-center">
         <div class="col-md-4 col-sm-6">
             <div class="card shadow-lg">
-                <div class="card-header bg-success text-white text-center">
+                <div class="card-header " style="background-color: #78917b; color: white; text-align: center;">
                     <h4>Add Apartment</h4>
                 </div>
                 <div class="card-body">
-                    <form method="post" class="needs-validation" novalidate enctype="multipart/form-data">
+                    <form method="post" class="needs-validation" novalidate  enctype="multipart/form-data">
                         {% csrf_token %}
-
                         <!-- Apartment Name -->
                         {% for field in apartment_form %}
                             <div class="mb-3">
@@ -29,14 +28,12 @@
                         {% endfor %}
 
                         <!-- Images -->
-                        {% for field in images_form %}
-                            <div class="mb-3">
-                                <label for="{{ field.id_for_label }}" class="form-label fw-bold h6">{{ field.label }}</label>
-                                {{ field|add_class:"form-control form-control-sm w-100" }}
-                            </div>
-                        {% endfor %}
+                        <label for ="id_image" > העלה תמונות: </label>
 
-                        <button type="submit" class="btn btn-success w-100 btn-sm">Save</button>
+                        <input type ="file" name ="image" id ="id_image" multiple >
+
+
+                        <button type="submit" class="btn" style="background-color: #78917b; color: white; width: 100%; font-size: 14px;">Save</button>
                     </form>
                 </div>
             </div>

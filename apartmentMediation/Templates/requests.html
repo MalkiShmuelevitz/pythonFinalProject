@@ -1,7 +1,32 @@
 {% extends 'layout.html' %}
+
 {% block information %}
-    <h4>Requests</h4>
-    {% for request in requests %}
-    <h4>{{request.buyer}}</h4><h4>{{request.apartment}}</h4>
-    {%endfor%}
+<div style="max-width: 900px; margin: 30px auto; padding: 20px; direction: rtl;">
+    <!-- כותרת מרכזית -->
+    <div style="background: linear-gradient(135deg, #78917b, #6b46c1); padding: 30px; border-radius: 15px; color: white; text-align: center; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
+        <h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 10px;">בקשות להתעניינות</h1>
+        <p style="font-size: 1.2rem;">כאן תוכל לראות את כל ההתעניינויות בדירה שלך</p>
+    </div>
+
+    <!-- רשימת הבקשות -->
+    <div style="margin-top: 30px;">
+        {% if requests|length > 0 %}
+            {% for request in requests %}
+                <div style="margin-bottom: 20px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); text-align: right;">
+                    <h2 style="font-size: 1.5rem; font-weight: bold; color: #78917b;">קונה: {{ request.buyer.username }}</h2>
+                    <p style="font-size: 1.2rem; color: #6b7280; margin-top: 10px;"><strong>דירה:</strong> {{ request.apartment }}</p>
+                    <button onclick="window.location.href='/apartments';"
+                            style="padding: 10px 20px; background: #78917b; color: white; border: none; border-radius: 10px; font-size: 1rem; cursor: pointer; transition: all 0.3s;">
+                        עיין בדירה
+                    </button>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div style="background: wight; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
+                <h2 style="font-size: 1.5rem; color: #78917b;">אין כרגע בקשות</h2>
+                <p style="font-size: 1.2rem; color: #6b7280;">נסה לבדוק מאוחר יותר</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
